@@ -1,0 +1,43 @@
+devforge/
+├── .github/
+│   └── workflows/
+│       ├── ci.yml
+│       └── release.yml
+├── crates/                      # Rust components
+│   ├── core/                    # Core engine
+│   │   ├── src/
+│   │   │   ├── compatibility.rs
+│   │   │   └── lib.rs
+│   │   └── Cargo.toml
+│   └── build-tools/            # Performance-critical build tools
+│       ├── src/
+│       │   └── lib.rs
+│       └── Cargo.toml
+├── packages/                    # TypeScript/JavaScript packages
+│   ├── cli/                    # Main CLI package
+│   │   ├── src/
+│   │   │   ├── commands/
+│   │   │   └── index.ts
+│   │   └── package.json
+│   ├── builder/               # Build system
+│   │   ├── src/
+│   │   │   ├── index.ts
+│   │   │   ├── optimize.ts
+│   │   │   └── sourcemaps.ts
+│   │   └── package.json
+│   └── config/                # Configuration management
+│       ├── src/
+│       │   └── index.ts
+│       └── package.json
+├── docs/                      # Documentation
+│   ├── getting-started.md
+│   └── configuration.md
+├── scripts/                   # Development scripts
+│   ├── setup.sh              # Development environment setup
+│   └── distribute.sh         # Release distribution
+├── .gitignore
+├── Cargo.toml                # Rust workspace config
+├── package.json              # Node workspace config
+├── turbo.json                # Turbo config
+├── pnpm-workspace.yaml       # PNPM workspace config
+└── README.md

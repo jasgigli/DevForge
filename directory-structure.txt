@@ -1,0 +1,14 @@
+devforge/
+├── crates/
+│   ├── core/               # Rust core engine
+│   └── performance/        # Performance-critical components
+├── packages/
+│   ├── cli/               # Command-line interface
+│   ├── config/            # Configuration management
+│   ├── dev-server/        # Development server
+│   ├── builder/           # Build system
+│   ├── templates/         # Project templates
+│   └── utils/             # Shared utilities
+├── docs/                  # Documentation
+├── tests/                 # Integration tests
+└── scripts/              # Development scripts

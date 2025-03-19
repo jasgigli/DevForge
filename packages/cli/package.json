@@ -1,16 +1,23 @@
 {
   "name": "@devforge/cli",
   "version": "0.1.0-beta",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "description": "Modern development toolkit CLI",
+  "publishConfig": {
+    "access": "public",
+    "tag": "beta"
+  },
   "bin": {
     "devforge": "./bin/devforge.js"
   },
+  "files": [
+    "dist",
+    "bin",
+    "README.md"
+  ],
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc -w",
-    "test": "jest",
-    "lint": "eslint src"
+    "prebuild": "rimraf dist",
+    "build": "tsc && node scripts/copy-assets.js",
+    "prepublishOnly": "pnpm build"
   },
   "dependencies": {
     "commander": "^9.0.0",
@@ -22,5 +29,8 @@
     "typescript": "^5.0.0",
     "@types/node": "^18.0.0",
     "@types/inquirer": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }

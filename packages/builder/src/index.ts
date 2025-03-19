@@ -1,30 +1,58 @@
-import { build as esbuild } from 'esbuild';
-import { optimizeAssets } from './optimize';
-import { generateSourceMaps } from './sourcemaps';
+import * as esbuild from "esbuild";
+import { optimizeAssets } from "./optimize";
+import { generateSourceMaps } from "./sourcemaps";
+
+export interface BuildConfig {
+  entry: string;
+  output: string;
+  plugins?: string[];
+  minify?: boolean;
+  sourcemap?: boolean;
+  target?: string[];
+}
 
 export class Builder {
-  private config: any;
+  private config: BuildConfig;
 
-  constructor(config: any) {
-    this.config = config;
+  constructor(config: BuildConfig) {
+    this.config = {
+      minify: true,
+      sourcemap: true,
+      target: ["es2020"],
+      ...config,
+    };
   }
 
-  async build() {
+  async build(): Promise<void> {
     try {
       // Build process
-      await esbuild({
+      await esbuild.build({
         entryPoints: [this.config.entry],
+        outdir: this.config.output || "dist",
         bundle: true,
-        minify: true,
-        sourcemap: true,
-        outdir: 'dist',
+        minify: this.config.minify,
+        sourcemap: this.config.sourcemap,
+        target: this.config.target,
+        plugins: this.loadPlugins(),
       });
 
-      await optimizeAssets();
-      await generateSourceMaps();
+      if (this.config.minify) {
+        await optimizeAssets();
+      }
+
+      if (this.config.sourcemap) {
+        await generateSourceMaps();
+      }
+
+      console.log("Build completed successfully!");
     } catch (error) {
-      console.error('Build failed:', error);
-      process.exit(1);
+      console.error("Build failed:", error);
+      throw error; // Let the caller handle the error
     }
+  }
+
+  private loadPlugins(): esbuild.Plugin[] {
+    // Here you could implement plugin loading logic
+    return [];
   }
 }

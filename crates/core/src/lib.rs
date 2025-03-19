@@ -3,17 +3,11 @@ pub mod compiler;
 pub mod config;
 pub mod performance;
 
-pub struct DevForgeCore {
-    config: config::Config,
-}
+pub use build::BuildConfig;
+pub use compiler::CompilerOptions;
+pub use config::Config;
+pub use performance::PerformanceMetrics;
 
-impl DevForgeCore {
-    pub fn new(config: config::Config) -> Self {
-        Self { config }
-    }
-
-    pub async fn initialize(&self) -> anyhow::Result<()> {
-        // Initialize core systems
-        Ok(())
-    }
+pub fn init() -> &'static str {
+    "DevForge Core initialized"
 }

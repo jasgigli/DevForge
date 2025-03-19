@@ -1,6 +1,6 @@
 {
-  "name": "@devforge/cli",
-  "version": "0.1.0-beta",
+  "name": "@jasgiigli/devforge-cli",
+  "version": "0.1.2-beta",
   "description": "Modern development toolkit CLI",
   "publishConfig": {
     "access": "public",

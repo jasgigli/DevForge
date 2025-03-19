@@ -1,6 +1,6 @@
 {
   "name": "devforge",
-  "version": "0.1.0-beta",
+  "version": "0.1.2-beta",
   "private": true,
   "workspaces": [
     "packages/*"
@@ -8,9 +8,9 @@
   "scripts": {
     "clean": "node scripts/clean.js",
     "build": "turbo run build",
-    "build:release": "powershell ./scripts/build-release.ps1",
-    "verify": "powershell ./scripts/verify-publish.ps1",
-    "publish:beta": "powershell ./scripts/publish.ps1",
+    "build:release": "powershell .\\scripts\\build-release.ps1",
+    "verify": "powershell .\\scripts\\verify-publish.ps1",
+    "publish:beta": "powershell .\\scripts\\publish.ps1",
     "publish:dry-run": "pnpm publish --dry-run",
     "dev": "turbo run dev",
     "test": "turbo run test",

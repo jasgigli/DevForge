@@ -1,5 +1,8 @@
+# Stop on first error
+$ErrorActionPreference = "Stop"
+
 # Verify package contents
-Write-Host "🔍 Verifying package contents..." -ForegroundColor Cyan
+Write-Host "Verifying package contents..." -ForegroundColor Cyan
 
 # Pack without publishing
 Set-Location packages/cli
@@ -8,7 +11,7 @@ Set-Location ../..
 
 # Check required files
 $REQUIRED_FILES = @(
-    "bin/devforge.exe",
+    "bin/devforge.js",
     "dist/index.js",
     "dist/index.d.ts",
     "README.md",
@@ -18,14 +21,16 @@ $REQUIRED_FILES = @(
 $MISSING_FILES = $false
 foreach ($file in $REQUIRED_FILES) {
     if ($PACK_OUTPUT -notmatch $file) {
-        Write-Host "❌ Missing required file: $file" -ForegroundColor Red
+        Write-Host "Missing required file: $file" -ForegroundColor Red
         $MISSING_FILES = $true
     }
 }
 
 if ($MISSING_FILES) {
-    Write-Host "❌ Verification failed: Missing required files" -ForegroundColor Red
+    Write-Host "Verification failed: Missing required files" -ForegroundColor Red
     exit 1
 }
 
-Write-Host "✅ Package verification successful!" -ForegroundColor Green
+# Use simple ASCII characters instead of Unicode
+Write-Host "Package verification successful!" -ForegroundColor Green
+

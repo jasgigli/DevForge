@@ -1,0 +1,304 @@
+I'll outline the deployment strategy for the DevForge beta version to reach developers. Here's a comprehensive plan:
+
+1. First, let's set up the NPM package deployment:
+
+````json path=devforge/packages/cli/package.json mode=EDIT
+{
+  "name": "@devforge/cli",
+  "version": "0.1.0-beta",
+  "publishConfig": {
+    "access": "public",
+    "tag": "beta"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devforge/devforge.git"
+  },
+  "bin": {
+    "devforge": "./bin/devforge.js"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "README.md"
+  ]
+}
+````
+
+2. Create a GitHub Actions workflow for automated deployment:
+
+````yaml path=devforge/.github/workflows/release.yml mode=EDIT
+name: Release Beta
+
+on:
+  push:
+    tags:
+      - 'v*-beta.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+      
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      
+      - name: Install dependencies
+        run: |
+          pnpm install
+          
+      - name: Build packages
+        run: pnpm build
+        
+      - name: Publish to NPM
+        run: pnpm publish --tag beta --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+````
+
+3. Create installation documentation:
+
+````markdown path=devforge/docs/installation.md mode=EDIT
+# DevForge Beta Installation
+
+## Quick Start
+```bash
+# NPM
+npm install -g @devforge/cli@beta
+
+# Yarn
+yarn global add @devforge/cli@beta
+
+# PNPM
+pnpm add -g @devforge/cli@beta
+```
+
+## System Requirements
+- Node.js ≥ 16
+- Rust ≥ 1.65
+- Git
+
+## Getting Started
+After installation, create your first project:
+```bash
+devforge new my-app
+cd my-app
+devforge dev
+```
+
+## Beta Testing Guidelines
+1. Report issues: github.com/devforge/devforge/issues
+2. Join discussions: discord.gg/devforge
+3. Share feedback: feedback@devforge.dev
+
+## Known Limitations
+- Beta version supports React/TypeScript projects only
+- Some features may be unstable
+- Performance optimizations pending
+````
+
+4. Create a landing page for beta testers:
+
+````typescript path=devforge/website/pages/beta.tsx mode=EDIT
+import { BetaSignup } from '../components/BetaSignup';
+
+export default function BetaPage() {
+  return (
+    <div className="beta-container">
+      <h1>DevForge Beta Program</h1>
+      
+      <section className="quick-start">
+        <h2>Quick Start</h2>
+        <pre>
+          npm install -g @devforge/cli@beta
+        </pre>
+      </section>
+
+      <section className="features">
+        <h2>Beta Features</h2>
+        <ul>
+          <li>Zero-config project setup</li>
+          <li>Integrated development environment</li>
+          <li>Automated tool configuration</li>
+          <li>Performance-optimized builds</li>
+        </ul>
+      </section>
+
+      <BetaSignup />
+    </div>
+  );
+}
+````
+
+5. Create a feedback collection system:
+
+````typescript path=devforge/packages/cli/src/commands/feedback.ts mode=EDIT
+import { Command } from 'commander';
+import inquirer from 'inquirer';
+
+export async function collectFeedback() {
+  const feedback = await inquirer.prompt([
+    {
+      type: 'select',
+      name: 'category',
+      message: 'What area would you like to provide feedback on?',
+      choices: [
+        'Project Setup',
+        'Development Experience',
+        'Build Performance',
+        'Bug Report',
+        'Feature Request'
+      ]
+    },
+    {
+      type: 'text',
+      name: 'feedback',
+      message: 'Please describe your experience:'
+    }
+  ]);
+
+  // Send feedback to collection endpoint
+  await sendFeedback(feedback);
+}
+````
+
+6. Create a beta monitoring system:
+
+````typescript path=devforge/packages/telemetry/src/index.ts mode=EDIT
+export class BetaTelemetry {
+  async track(event: string, data: any) {
+    if (!this.hasUserConsent()) return;
+
+    await fetch('https://telemetry.devforge.dev/collect', {
+      method: 'POST',
+      body: JSON.stringify({
+        event,
+        data,
+        version: process.env.PACKAGE_VERSION,
+        timestamp: new Date().toISOString()
+      })
+    });
+  }
+
+  private hasUserConsent(): boolean {
+    return process.env.DEVFORGE_TELEMETRY !== 'false';
+  }
+}
+````
+
+7. Distribution channels setup:
+
+````bash path=devforge/scripts/distribute.sh mode=EDIT
+#!/bin/bash
+
+# Version management
+VERSION=$(node -p "require('./package.json').version")
+BETA_TAG="beta"
+
+# NPM distribution
+npm publish --tag $BETA_TAG
+
+# Homebrew distribution
+brew tap devforge/beta
+brew update
+brew install devforge-beta
+
+# Create GitHub release
+gh release create v$VERSION \
+  --title "DevForge Beta $VERSION" \
+  --notes "Beta release for testing" \
+  --prerelease
+
+# Update documentation
+npm run docs:deploy
+
+# Notify beta testers
+node scripts/notify-beta-testers.js
+````
+
+8. Beta testing communication:
+
+````markdown path=devforge/docs/BETA_TESTING.md mode=EDIT
+# DevForge Beta Testing Program
+
+## Getting Started
+1. Install DevForge Beta:
+   ```bash
+   npm install -g @devforge/cli@beta
+   ```
+
+2. Join our community:
+   - Discord: discord.gg/devforge
+   - GitHub Discussions: github.com/devforge/devforge/discussions
+   - Beta Testers Slack: devforge-beta.slack.com
+
+## Providing Feedback
+1. Use the CLI feedback command:
+   ```bash
+   devforge feedback
+   ```
+
+2. Report issues on GitHub:
+   github.com/devforge/devforge/issues/new
+
+3. Share success stories:
+   devforge.dev/beta/stories
+
+## Beta Testing Focus Areas
+1. Project Creation Flow
+2. Development Server Performance
+3. Build System Reliability
+4. Tool Integration Experience
+5. Error Handling and Recovery
+
+## Known Limitations
+- Beta features may change
+- Some advanced features disabled
+- Performance monitoring enabled
+````
+
+To deploy and distribute the beta:
+
+1. Push to NPM:
+```bash
+npm publish --tag beta
+```
+
+2. Share with the community:
+- Post on Reddit (r/javascript, r/webdev, r/programming)
+- Share on Twitter with #DevForgeBeta
+- Announce on Discord/Slack developer communities
+- Write blog posts on Dev.to and Medium
+
+3. Monitor adoption:
+- Track installations
+- Monitor GitHub issues
+- Collect feedback through the built-in system
+- Watch error reports and performance metrics
+
+4. Support channels:
+- GitHub Discussions for technical questions
+- Discord server for community support
+- Email support for critical issues
+- Weekly office hours for beta testers
+
+Would you like me to elaborate on any part of the deployment strategy or create additional components for the beta release?
+
+
+# Clean everything first
+pnpm clean
+
+# Reinstall dependencies
+pnpm install
+
+# Try publishing again
+pnpm publish:beta
